@@ -6,6 +6,7 @@ pipeline {
         COMPOSE_FILE = "docker-compose.yaml"
     }
 
+    stages {
         stage('1. Проверка Docker Swarm') {
             steps {
                 script {
