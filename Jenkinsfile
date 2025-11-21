@@ -7,6 +7,25 @@ pipeline {
     }
 
     stages {
+        stage('0. Проверка SQL-запросов') {
+            steps {
+                script {
+                    def missingContacts = sh(
+                        script: """
+                            grep -R --include='*.php' -E 'SELECT|FROM|JOIN' ./app | grep -i 'users' | grep -vi 'contacts' || true
+                        """,
+                        returnStdout: true
+                    ).trim()
+
+                    if (missingContacts) {
+                        error "Проблема: обнаружены SQL-запросы с таблицей users без поля contacts:\\n${missingContacts}"
+                    } else {
+                        echo "Всё ок - все SQL-запросы с таблицей users содержат поле contacts"
+                    }
+                }
+            }
+        }
+
         stage('1. Проверка Docker Swarm') {
             steps {
                 script {
